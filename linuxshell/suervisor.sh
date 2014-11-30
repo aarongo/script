@@ -15,6 +15,7 @@ tomcat_d=/deploy
 mongodb_d=/data/db
 solrwar_d=/solrdeplpy
 sorlhome_d=/dockersolr
+dockerpro=`docker ps | awk '{print $1}' >1.txt && wc -l 1.txt | awk '{print $1}'`
 create(){
 	ls $mysql $tomcat_d $mongodb_d $solrwar_d $sorlhome_d >/dev/null  2>&1
 	if [ $? -ne 0 ]; then
@@ -22,6 +23,14 @@ create(){
 		mkdir -p $mysql $tomcat_d $mongodb_d $solrwar_d $sorlhome_d
 	else
 		echo -e "\033[31m Directory already exists \033[0m"
+	fi
+}
+dockerps(){
+	if [ $dockerpro -gt 1 ]; then
+		echo -e "\033[31m Kill docker ps\033[0m"
+		docker rm $(docker ps -a -q)
+	else 
+		echo -e "\033[31m Nothting \033[0m"
 	fi
 
 }
@@ -154,6 +163,7 @@ case $1 in
 		;;	
 	dall)
 		create;
+		dockerps;
 		d_solr;
 		d_mongodb;
 		d_memcach;
