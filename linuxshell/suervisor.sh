@@ -1,6 +1,7 @@
 #!/bin/bash
 #Use supervisor start all docker
 addrs=172.31.1.160:5000
+mountdir=172.31.1.160:/install/dockerimages
 #Get HostIP
 IP=`ifconfig | grep 'inet addr' | grep -v '127.0.0.1' | tail -1 | cut -d: -f2  | awk '{print $1}'`
 #Get All images name 
@@ -15,15 +16,15 @@ mysql_d=/mysqldata
 tomcatweb_d=/deploy
 tomcatfront_d=/deployfront
 mongodb_d=/data/db
-solrwar_d=/solrdeplpy
+solrwar_d=/solrdeplpoy
 sorlhome_d=/dockersolr
 dockerpro=`docker ps | awk '{print $1}'`
 #mount images
 local_upload=/install/upload
-mount_web=/deploy/ROOT/assets/
-mount_web1=/deploy/cybershop-web-0.0.1-SNAPSHOT/assets/
-mount_front=/deployfront/cybershop-front-0.0.1-SNAPSHOT/assets/
-mount_front1=/deployfront/ROOT/assets/
+mount_web=/deploy/ROOT/assets
+mount_web1=/deploy/cybershop-web-0.0.1-SNAPSHOT/assets
+mount_front=/deployfront/cybershop-front-0.0.1-SNAPSHOT/assets
+mount_front1=/deployfront/ROOT/assets
 create(){
 	ls $mysql $tomcatweb_d $mongodb_d $solrwar_d $sorlhome_d $tomcatfront_d >/dev/null  2>&1
 	if [ $? -ne 0 ]; then
@@ -103,7 +104,7 @@ solr(){
 }
 #-p 3306:3306 
 mysql(){
-	docker run -d -p 1024:22 --name mysql -v $mysql_d:/var/lib/mysql -v /etc/localtime:/etc/localtime $mysql
+	docker run -d -p 1024:22 -p 3306:3306  --name mysql -v $mysql_d:/var/lib/mysql -v /etc/localtime:/etc/localtime $mysql
 	if [ $? -ne 0 ];then
                 echo -en "\\033[1;33m"
                 echo "Mysql start Fail"
@@ -136,7 +137,7 @@ mongodb(){
 }
 #S-v $local_upload:/deploy/ROOT/assets/upload -v $local_upload:/deploy/cybershop-web-0.0.1-SNAPSHOT/assets/upload 
 tomcatweb(){
-	docker run -p 1025:22 -p 80:8080 -d --name web --link mysql:mysql --link mongodb:mongodb --link memcache:memcache --link solr:solr -v $tomcatweb_d:/deploy -v /etc/localtime:/etc/localtime $tomcatweb:web
+	docker run -p 1025:22 -p 8081:8080 -d --name web --link mysql:mysql --link mongodb:mongodb --link memcache:memcache --link solr:solr -v $tomcatweb_d:/deploy -v /etc/localtime:/etc/localtime $tomcatweb:web
 	if [ $? -ne 0 ];then
                 echo -en "\\033[1;33m"
                 echo "Web start suceessful"
@@ -147,7 +148,7 @@ tomcatweb(){
 }
 # -v $local_upload:/deployfront/ROOT/assets/upload -v  $local_upload:/deployfront/cybershop-front-0.0.1-SNAPSHOT/assets/upload 
 tomcatfront(){
-	docker run -p 1030:22 -p 8081:8080 -d --name front --link mysql:mysql --link mongodb:mongodb --link memcache:memcache --link solr:solr -v $tomcatfront_d:/deployfront -v /etc/localtime:/etc/localtime $tomcatfront:front
+	docker run -p 1030:22 -p 80:8080 -d --name front --link mysql:mysql --link mongodb:mongodb --link memcache:memcache --link solr:solr -v $tomcatfront_d:/deployfront -v /etc/localtime:/etc/localtime $tomcatfront:front
 	if [ $? -ne 0 ];then
          echo -en "\\033[1;33m"
                 echo "front start suceessful"
@@ -156,27 +157,26 @@ tomcatfront(){
         fi
 	echo -e "\033[32m start  $tomcatfront:$t-front OK Address http://$IP:8081 \033[0m"
 }
-#mountweb(){
-	#echo "wait 60S"
-	#sleep 60
-	#echo -n "Mount upload"
-    #ln -s $local_upload $mount_web
-    #ln -s $local_upload $mount_web1
-    #ln -s $local_upload $mount_front
-    #ln -s $local_upload $mount_front1
-    #echo -e "\033[32m mount all front/web suceessful \033[0m"
-#}
+#$mount_web/upload  $mount_front1/upload  && mount $mountdir $mount_web/upload && mount $mountdir $mount_front1/upload
+mountweb(){
+	echo "wait 60S"
+	sleep 70
+	echo -n "Mount upload"
+    mkdir   $mount_web1/upload  $mount_front/upload   && mount  -t nfs $mountdir  $mount_web1/upload && mount -t nfs $mountdir  $mount_front/upload 
+		if [ $? -ne 0 ]; then
+			echo -e "\033[32m  cerate Fail  Trying \033[0m"
+		else
+			echo -e "\033[32m cerate Ok \033[0m"
+		fi
+    echo -e "\033[32m mount all front/web suceessful \033[0m"
+}
+#umount  $mount_web/upload &&   && umount $mount_front1/upload 
 stop(){
-	echo "delet mount "
-	#rm -f ${mount_web}upload
-	#rm -f ${mount_web1}upload
-	#rm -f ${mount_front}upload
-	#rm -f ${mount_front1}upload
-	#echo "Delet  upload successful"
-	docker stop web front mysql mongodb memcache solr
+	echo "umount "
+	umount   $mount_web1/upload && umount $mount_front/upload && docker stop web front mysql mongodb memcache solr
 	if [ $? -ne 0 ]; then
 		echo -en "\\033[1;33m"
-        echo "front/web stop suceessful"
+        echo "front/web stop/umount suceessful"
         echo -en "\\033[1;39m"
         exit 1
 	fi
