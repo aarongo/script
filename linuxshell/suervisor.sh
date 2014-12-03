@@ -46,7 +46,7 @@ dockerps(){
 d_solr(){	
 		if [ ! $solr ]; then
 			echo -e "\033[31m Downloading Solr images......... \033[0m"
-			docker pull $solr
+			docker pull $addrs/solr
 		else
 			echo -e "\033[32m $solr exits \033[0m"
 		fi
@@ -54,7 +54,7 @@ d_solr(){
 d_tomact-web(){
 		if [ ! $tomcatweb ]; then
 			echo -e "\033[31m Downloading tomcatweb images........ \033[0m"
-			docker pull $tomcatweb
+			docker pull $addrs/tomcat:web
 		else
 			echo -e "\033[32m $tomcatweb exits \033[0m"
 		fi
@@ -62,7 +62,7 @@ d_tomact-web(){
 d_tomcatfront(){
 	if [ ! $tomcatweb ]; then
 			echo -e "\033[31m Downloading tomcatfront images........ \033[0m"
-			docker pull $tomcatfront
+			docker pull $addrs/tomcat:front
 		else
 			echo -e "\033[32m $tomcatfront exits \033[0m"
 		fi
@@ -70,7 +70,7 @@ d_tomcatfront(){
 d_mongodb(){	
 		if [ ! $mongodb ]; then
 			echo -e "\033[31m Downloading Mongodb images......... \033[0m"
-			docker pull $mongodb
+			docker pull $addrsmongodb
 		else 
 			echo -e "\033[32m $mongodb exits \033[0m"
 		fi
@@ -78,7 +78,7 @@ d_mongodb(){
 d_memcach(){
 		if [ ! $memcache ]; then
 			echo -e "\033[31m Downloading Memcach images........ \033[0m"
-			docker pull $memcache
+			docker pull $addrsmemcache
 		else
 			echo -e "\033[32m $memcach exits \033[0m"
 		fi
@@ -86,7 +86,7 @@ d_memcach(){
 d_mysql(){	
 		if [ ! $mysql ]; then
 			echo -e "\033[31m Downloading Mysql images.......... \033[0m"
-			docker pull $mysql
+			docker pull $addrsmysql
 		else
 			echo -e "\033[32m $mysql exits \033[0"
 		fi
@@ -162,18 +162,18 @@ mountweb(){
 	echo "wait 60S"
 	sleep 70
 	echo -n "Mount upload"
-    mkdir   $mount_web1/upload  $mount_front/upload   && mount  -t nfs $mountdir  $mount_web1/upload && mount -t nfs $mountdir  $mount_front/upload 
+    mkdir  $mount_web/upload $mount_web1/upload  $mount_front/upload  $mount_front1/upload && mount  -t nfs $mountdir  $mount_web1/upload && mount -t nfs $mountdir  $mount_front/upload  && mount -t nfs $mountdir $mount_web/upload && mount -t nfs $mountdir $mount_front1/upload
 		if [ $? -ne 0 ]; then
-			echo -e "\033[32m  cerate Fail  Trying \033[0m"
+			echo -e "\033[32m  cerate Fail  \033[0m"
 		else
-			echo -e "\033[32m cerate Ok \033[0m"
+			echo -e "\033[32m mount all front/web suceessful \033[0m"
 		fi
-    echo -e "\033[32m mount all front/web suceessful \033[0m"
+    
 }
 #umount  $mount_web/upload &&   && umount $mount_front1/upload 
 stop(){
 	echo "umount "
-	umount   $mount_web1/upload && umount $mount_front/upload && docker stop web front mysql mongodb memcache solr
+	umount  $mount_web/upload && umount $mount_web1/upload && umount $mount_front/upload && umount $mount_front1/upload && docker stop web front mysql mongodb memcache solr
 	if [ $? -ne 0 ]; then
 		echo -en "\\033[1;33m"
         echo "front/web stop/umount suceessful"
