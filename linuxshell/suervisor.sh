@@ -1,6 +1,5 @@
 #!/bin/bash
 #Use supervisor start all docker
-#test
 addrs=172.31.1.160:5000
 mountdir=172.31.1.160:/install/dockerimages
 #Get HostIP
