@@ -5,8 +5,8 @@ mountdir=172.31.1.160:/install/dockerimages
 #Get HostIP
 IP=`ifconfig | grep 'inet addr' | grep -v '127.0.0.1' | tail -1 | cut -d: -f2  | awk '{print $1}'`
 #Get All images name 
-tomcatweb=`docker images | grep 172.31.1.160 | grep web | grep tomcat7 | awk '{print $1}'`
-tomcatfront=`docker images | grep 172.31.1.160 | grep front | grep tomcat7 | awk '{print $1}'`
+tomcatweb=`docker images | grep 172.31.1.160 | grep web | awk '{print $1}'`
+tomcatfront=`docker images | grep 172.31.1.160 | grep front | awk '{print $1}'`
 solr=`docker images | grep 172.31.1.160 | grep solr | awk '{print $1}'`
 mysql=`docker images | grep 172.31.1.160| awk '{print $1}' | grep mysql`
 memcache=`docker images | grep 172.31.1.160 | awk '{print $1}' | grep memcached`
@@ -31,15 +31,6 @@ create(){
 		mkdir -p $mysql $tomcatweb_d $mongodb_d $solrwar_d $sorlhome_d $tomcatfront_d
 	else
 		echo -e "\033[31m Directory already exists \033[0m"
-	fi
-}
-dockerps(){
-	if [ ! $dockerpro ]; then
-		echo -e "\033[31m Kill docker ps \033[0m"
-		docker rm $(docker ps -a -q)
-		sleep 30
-	else 
-		echo -e "\033[31m Nothting \033[0m"
 	fi
 }
 d_solr(){	
@@ -165,7 +156,7 @@ ssh(){
 	if [ $? -ne 0 ]; then
 		echo -e "\033[32m Running OK  \033[0m"
 	else
-		echo -e "\033[32m Running Fail  \033[0m"
+		echo -e "\033[32m  Running Fail \033[0m"
 	fi
 }
 stop(){
@@ -181,7 +172,6 @@ main(){
 case $1 in
 	dall)
 		create;
-		dockerps;
 		d_solr;
 		d_mongodb;
 		d_memcach;
