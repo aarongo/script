@@ -9,6 +9,7 @@
  "*password:" { send "$password\r" }
  }
  expect "#*"
- send "umount /deploy/ROOT/assets/upload && umount /deploy/cybershop-web-0.0.1-SNAPSHOT/assets/upload \r"
+ send "umount /deploy/ROOT/assets/upload\r"
+ send "umount /deploy/cybershop-web-0.0.1-SNAPSHOT/assets/upload \r"
  send  "exit\r"
  expect eof
