@@ -188,7 +188,6 @@ case $1 in
 		;;
 	stop)
 		stop;
-		dockerps;
 		;;
 	restart)
 		stop;
