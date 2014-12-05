@@ -1,7 +1,6 @@
 #!/bin/bash
 #Use supervisor start all docker
 addrs=172.31.1.160:5000
-#mountdir=172.31.1.160:/install/dockerimages
 #Get HostIP
 IP=`ifconfig | grep 'inet addr' | grep -v '127.0.0.1' | tail -1 | cut -d: -f2  | awk '{print $1}'`
 #Get All images name 
