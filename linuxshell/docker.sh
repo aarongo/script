@@ -1,5 +1,4 @@
 #!/bin/bash
-#Docker images From adds
 adds=172.31.1.160:5000
 web_d=/deploy
 mongodb_d=/install/centos/mongodb/data
