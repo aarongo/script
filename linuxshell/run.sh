@@ -2,7 +2,7 @@
 #这个是启动不带有supervisor的所有images
 #Host IP addrs
 IP=`ifconfig | grep 'inet addr' | grep -v '127.0.0.1' | tail -1 | cut -d: -f2  | awk '{print $1}'`
-#This is images names
+#This is images names test
 SOLR=`docker images | grep solr | awk '{print $1}'`
 MYSQL=`docker images | grep mysql | awk '{print $1}'`
 MEMCACHE=`docker images | grep memcach | awk '{print $1}'`
